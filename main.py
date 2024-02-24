@@ -1,3 +1,4 @@
+import asyncio
 import logging
 import os
 import sys
@@ -65,16 +66,10 @@ class Bot(commands.Bot):
         self.logger.info("Bot is ready!")
 
 
+async def main() -> None:
+    async with aiohttp.ClientSession() as session, Bot() as boat:
+        await boat.start(TOKEN, reconnect=True)
+
+
 if __name__ == "__main__":
-    bot = Bot()
-    try:
-        bot.run(TOKEN, log_handler=None)
-    except Exception as e:
-        bot.logger.error(f"{type(e).__name__}: {e}")
-        traceback.print_exc()
-    except KeyboardInterrupt:
-        bot.logger.info("Shutting down...")
-        bot.loop.run_until_complete(bot.session.close())
-        bot.logger.info("Goodbye!")
-    finally:
-        sys.exit()
+    asyncio.run(main())
